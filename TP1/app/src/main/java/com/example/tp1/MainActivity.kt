@@ -148,12 +148,16 @@ class MainActivity : ComponentActivity() {
         var dateError by rememberSaveable { mutableStateOf("") }
         var descriptionError by rememberSaveable { mutableStateOf("") }
 
+        // State to keep track of the button text
+        var buttonText by remember { mutableStateOf("Add") }
+
         // Update fields with selected trip data when it changes
         LaunchedEffect(selectedTrip.value) {
             selectedTrip.value?.let { trip ->
                 destination = trip.destination
                 date = trip.date
                 description = trip.description
+                buttonText = "Update" // Set button text to "Update" when modifying
             }
         }
 
@@ -223,7 +227,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            // Add button to submit the trip
+            // Add button to submit/update the trip
             Button(
                 onClick = {
                     // Check if a trip is selected for modification
@@ -234,13 +238,16 @@ class MainActivity : ComponentActivity() {
                         modifiedTrip.date = date
                         modifiedTrip.description = description
 
-                    // Clear the selected trip
+                        // Clear the selected trip
                         selectedTrip.value = null
 
-                    // Clear the input fields
+                        // Clear the input fields
                         destination = ""
                         date = ""
                         description = ""
+
+                        // Change the button text back to "Add"
+                        buttonText = "Add"
                     } else {
                         // Check for empty destination, date, and description
                         if (destination.isBlank() || date.isBlank() || description.isBlank()) {
@@ -279,7 +286,7 @@ class MainActivity : ComponentActivity() {
                 },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text(text = "Ajouter")
+                Text(text = buttonText) // Use the buttonText variable for dynamic text
             }
 
             // Display the list of trips below the button
