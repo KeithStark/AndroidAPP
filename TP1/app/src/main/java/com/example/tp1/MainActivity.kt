@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -76,6 +77,8 @@ class MainActivity : ComponentActivity() {
         onModifyClick: () -> Unit,
         onDeleteClick: (Trip) -> Unit
     ) {
+        var showDialog by remember { mutableStateOf(false) } // New state variable
+
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -99,13 +102,25 @@ class MainActivity : ComponentActivity() {
                     Text(text = "Modify")
                 }
                 Button(
-                    onClick = { onDeleteClick(trip) },
+                    onClick = {
+                        showDialog = true // Show the delete confirmation dialog
+                    },
                     modifier = Modifier
                         .size(100.dp, 36.dp)
                 ) {
                     Text(text = "Delete")
                 }
             }
+
+            DeleteConfirmationDialog(
+                showDialog = showDialog,
+                onConfirm = {
+                    onDeleteClick(trip)
+                },
+                onDismiss = {
+                    showDialog = false // Hide the delete confirmation dialog
+                }
+            )
         }
     }
 
@@ -297,6 +312,40 @@ class MainActivity : ComponentActivity() {
                     onDeleteClick = { trips.remove(trip) }
                 )
             }
+        }
+    }
+
+    @Composable
+    fun DeleteConfirmationDialog(
+        showDialog: Boolean,
+        onConfirm: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { onDismiss() },
+                title = { Text("Delete Trip") },
+                text = { Text("Are you sure you want to delete this trip?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onConfirm()
+                            onDismiss()
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        }
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
         }
     }
 
