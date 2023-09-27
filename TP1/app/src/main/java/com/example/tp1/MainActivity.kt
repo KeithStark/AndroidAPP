@@ -150,12 +150,21 @@ class MainActivity : ComponentActivity() {
         var dateError by rememberSaveable { mutableStateOf("") }
         var descriptionError by rememberSaveable { mutableStateOf("") }
 
+        // Update fields with selected trip data when it changes
+        LaunchedEffect(selectedTrip.value) {
+            selectedTrip.value?.let { trip ->
+                destination = trip.destination
+                date = trip.date
+                description = trip.description
+            }
+        }
+
         Column(
             modifier = Modifier
-                .fillMaxSize() // Fill the available space
+                .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center, // Center vertically
-            horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Input fields for destination, date, and description
             TextField(
@@ -165,7 +174,8 @@ class MainActivity : ComponentActivity() {
                     destinationError = ""
                 },
                 placeholder = { Text("Destination") },
-                modifier = Modifier.padding(bottom = 8.dp) // Add space below the TextField
+                modifier = Modifier.padding(bottom = 8.dp),
+                enabled = selectedTrip.value == null || selectedTrip.value != null
             )
 
             TextField(
@@ -175,7 +185,8 @@ class MainActivity : ComponentActivity() {
                     dateError = ""
                 },
                 placeholder = { Text("Date (JJ/MM/AAAA)") },
-                modifier = Modifier.padding(bottom = 8.dp) // Add space below the TextField
+                modifier = Modifier.padding(bottom = 8.dp),
+                enabled = selectedTrip.value == null || selectedTrip.value != null
             )
 
             TextField(
@@ -185,7 +196,8 @@ class MainActivity : ComponentActivity() {
                     descriptionError = ""
                 },
                 placeholder = { Text("Description") },
-                modifier = Modifier.padding(bottom = 8.dp) // Add space below the TextField
+                modifier = Modifier.padding(bottom = 8.dp),
+                enabled = selectedTrip.value == null || selectedTrip.value != null
             )
 
             // Display error messages if validation fails
@@ -213,14 +225,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            // Update the fields with details of the selected trip for modification
-            if (selectedTrip.value != null) {
-                val trip = selectedTrip.value!!
-                destination = trip.destination
-                date = trip.date
-                description = trip.description
-            }
-
             // Add button to submit the trip
             Button(
                 onClick = {
@@ -232,8 +236,13 @@ class MainActivity : ComponentActivity() {
                         modifiedTrip.date = date
                         modifiedTrip.description = description
 
-                        // Clear the selected trip
+                    // Clear the selected trip
                         selectedTrip.value = null
+
+                    // Clear the input fields
+                        destination = ""
+                        date = ""
+                        description = ""
                     } else {
                         // Check for empty destination, date, and description
                         if (destination.isBlank() || date.isBlank() || description.isBlank()) {
@@ -279,7 +288,7 @@ class MainActivity : ComponentActivity() {
             trips.forEach { trip ->
                 TripView(
                     trip = trip,
-                    onModifyClick = { /* TODO */ },
+                    onModifyClick = { selectedTrip.value = trip },
                     onDeleteClick = { trips.remove(trip) }
                 )
             }
