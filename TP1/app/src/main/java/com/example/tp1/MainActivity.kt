@@ -121,18 +121,16 @@ class MainActivity : ComponentActivity() {
                 TripView(
                     trip = trip,
                     onModifyClick = { onModifyClick(trip) },
-                    onDeleteClick = { tripToDelete ->
-                        // Delete the trip from the list
-                        onDeleteClick(tripToDelete)
-                    }
+                    onDeleteClick = { onDeleteClick(trip) }
                 )
             }
-            // Use LaunchedEffect to force recomposition when the trips list changes
             LaunchedEffect(trips) {
-                // Triggers recomposition
             }
         }
     }
+
+
+
 
 
 
