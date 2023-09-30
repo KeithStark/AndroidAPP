@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,7 +42,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme{
                 // Define a mutable list to store trip entries
-                val trips by remember { mutableStateOf(mutableListOf<Trip>()) }
+                val trips = remember { mutableStateListOf<Trip>() }
 
                 // Add a state variable to track the currently selected trip for modification
                 val selectedTrip = remember { mutableStateOf<Trip?>(null) }
@@ -51,6 +54,7 @@ class MainActivity : ComponentActivity() {
                         .padding(16.dp)
                 ) {
                     Column {
+                        AddTripView(trips, selectedTrip)
                         TripListView(
                             trips = trips,
                             onModifyClick = { trip ->
@@ -62,7 +66,6 @@ class MainActivity : ComponentActivity() {
                                 trips.remove(tripToDelete)
                             }
                         )
-                        AddTripView(trips, selectedTrip)
                     }
                 }
             }
@@ -131,15 +134,13 @@ class MainActivity : ComponentActivity() {
         onModifyClick: (Trip) -> Unit,
         onDeleteClick: (Trip) -> Unit
     ) {
-        Column {
-            trips.forEach { trip ->
+        LazyColumn {
+            items(trips) { trip ->
                 TripView(
                     trip = trip,
                     onModifyClick = { onModifyClick(trip) },
                     onDeleteClick = { onDeleteClick(trip) }
                 )
-            }
-            LaunchedEffect(trips) {
             }
         }
     }
@@ -180,7 +181,6 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Input fields for destination, date, and description
